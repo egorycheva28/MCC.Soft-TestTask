@@ -1,14 +1,11 @@
 const ADD_ELEMENT = "ADD_ELEMENT";
 const REMOVE_ELEMENT = "REMOVE_ELEMENT";
+const EDIT_ELEMENT = "EDIT_ELEMENT";
 const GET_TREE = "GET_TREE";
+const RESET_TREE = "RESET_TREE";
 
 let initialState = {
-    treess: [],
-    /*element: {
-        id: '',
-        name: ''
-        //children:[], parentId:''
-    },*/
+    tree: [],
     id: ''
 }
 
@@ -16,13 +13,23 @@ const treeReducer = (state = initialState, action) => {
     let newState = { ...state };
     switch (action.type) {
         case ADD_ELEMENT:
-            newState.treess = [...newState.treess, action.element];
-            console.log(newState.treess);
+            newState.tree = [...newState.tree, action.element];
             return newState;
         case REMOVE_ELEMENT:
-            newState.treess = newState.treess.filter(element => element.id !== action.id);
+            newState.tree = newState.tree.filter(element => element.id !== action.id);
+            return newState;
+        case EDIT_ELEMENT:
+            newState.tree = newState.tree.map((item) => {
+                if (item.id === action.id) {
+                    return { ...item, name: action.element };
+                }
+                return item;
+            });
             return newState;
         case GET_TREE:
+            return newState;
+        case RESET_TREE:
+            newState.tree = action.tree;
             return newState;
         default:
             return newState;
@@ -33,15 +40,13 @@ export function addElementActionCreator(data) {
     return { type: ADD_ELEMENT, element: data }
 }
 
-export function addElementThunkCreator(data) {
+export function addElementThunkCreator(element) {
     return (dispatch) => {
-        if (data == null) {
-            alert(("Введите название"));
+        if (element.name == '') {
+            alert(("Введите название элемента"));
             return;
         }
-        console.log(data);
-        dispatch(addElementActionCreator(data));
-        return data;
+        dispatch(addElementActionCreator(element));
     }
 }
 
@@ -51,26 +56,49 @@ export function removeElementActionCreator(data) {
 
 export function removeElementThunkCreator(id) {
     return (dispatch) => {
-        /*if (id == null) {
-            alert(("Введите название"));
+        if (id == null) {
+            alert(("Выберите элемент для удаления"));
             return;
-        }*/
-        console.log(id);
+        }
         dispatch(removeElementActionCreator(id));
-        return id;
     }
 }
 
-export function getTreeActionCreator(data) {
+export function editElementActionCreator(elementId, elementName) {
+    return { type: EDIT_ELEMENT, id: elementId, element: elementName }
+}
+
+export function editElementThunkCreator(elementId, elementName) {
+    return (dispatch) => {
+        if (elementId == null) {
+            alert(("Выберите элемент для редактирования"));
+            return;
+        }
+        if (elementName == '') {
+            alert(("Введите название элемента"));
+            return;
+        }
+        dispatch(editElementActionCreator(elementId, elementName));
+    }
+}
+
+export function getTreeActionCreator() {
     return { type: GET_TREE }
 }
 
-export function getTreeThunkCreator(id) {
+export function getTreeThunkCreator() {
     return (dispatch) => {
-        
-        console.log(id);
-        dispatch(getTreeActionCreator(id));
-        //return id;
+        dispatch(getTreeActionCreator());
+    }
+}
+
+export function resetTreeActionCreator() {
+    return { type: RESET_TREE, tree: [] }
+}
+
+export function resetTreeThunkCreator() {
+    return (dispatch) => {
+        dispatch(resetTreeActionCreator());
     }
 }
 

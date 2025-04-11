@@ -4,7 +4,7 @@ import Modal from "react-modal";
 import Element from "./componentItem";
 import store from "../store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { addElementThunkCreator, getTreeThunkCreator, removeElementThunkCreator } from "../reducers/treeReducer";
+import { addElementThunkCreator, editElementThunkCreator, getTreeThunkCreator, removeElementThunkCreator, resetTreeThunkCreator } from "../reducers/treeReducer";
 
 Modal.setAppElement('#root');
 
@@ -18,7 +18,8 @@ const Tree = ({ treeReducers }) => {
     const [name, setName] = useState("");
     const [currentElement, setCurrentElement] = useState(1);
     const [parent, setParent] = useState("");
-    const trees = useSelector(state => state.treeReducers.treess);
+    const [editName, setEditName] = useState("");
+    const trees = useSelector(state => state.treeReducers.tree);
 
     const openAddModal = () => {
         setAddModalIsOpen(true);
@@ -41,14 +42,19 @@ const Tree = ({ treeReducers }) => {
             id: currentElement,
             name: name
         };
-        await dispatch(addElementThunkCreator(newElement));
-        setCurrentElement(currentElement+1);
+        dispatch(addElementThunkCreator(newElement));
+        setCurrentElement(currentElement + 1);
         //setTree();
         setTree(name);
+        setName('');
+        setAddModalIsOpen(false);
+
     };
 
     const editElement = () => {
-
+        dispatch(editElementThunkCreator(selectedId, editName));
+        setEditName('');
+        setEditModalIsOpen(false);
     };
 
     const removeElement = async () => {
@@ -58,11 +64,12 @@ const Tree = ({ treeReducers }) => {
     };
 
     const resetTree = () => {
-        setTree();
+        dispatch(resetTreeThunkCreator());
+        //setTree();
     };
 
     useEffect(() => {
-       
+
         const fetchData = async () => {
 
             //setTree("Hello");
@@ -71,27 +78,22 @@ const Tree = ({ treeReducers }) => {
                 name: "qwe"
             };
             await dispatch(addElementThunkCreator(data));*/
-           
+
 
             dispatch(getTreeThunkCreator());
             setTree(store.getState());
-            //console.log(da);
-            console.log(store.getState().treeReducers.treess);
+            console.log(store.getState().treeReducers.tree);
             //console.log(store.getState().treeReducer.element);
             //console.log(trees);
 
         };
-        /*{
-                                    treeReducer.element.map((value) => {
-                                        <Element name={value.name} id={value.id} key={value.id} />
-                                    })
-                                } */
+
         fetchData();
     }, [dispatch]);
     console.log(trees);
     console.log(selectedId);
     console.log(store.getState());
-    //console.log(treeReducer.treess);
+
     return (
         <div className="container">
             <div className="box">
@@ -102,7 +104,7 @@ const Tree = ({ treeReducers }) => {
                     <div className="elements">
                         {
                             trees.map((value) => (
-                                <Element name={value.name} id={value.id} key={value.id} setSelectedId={setSelectedId}/>
+                                <Element name={value.name} id={value.id} key={value.id} setSelectedId={setSelectedId} />
                             ))
                         }
 
@@ -114,9 +116,9 @@ const Tree = ({ treeReducers }) => {
                         <div className="content">
                             <button onClick={closeAddModal} className="closeButton">&times;{ }</button>
                             <h3>Add element</h3>
-                            <label>Название</label>
+                            <label className="texts">Название</label>
                             <input type='text' value={name} onChange={(e) => setName(e.target.value)} placeholder='Введите название элемента' ></input>
-                            <label>родительский элемент</label>
+                            <label className="texts">родительский элемент</label>
                             <input type='text' value={parent} onChange={(e) => setParent(e.target.value)}></input>
                             <button onClick={addElement}>Add</button>
                         </div>
@@ -128,8 +130,8 @@ const Tree = ({ treeReducers }) => {
                         <div className="content">
                             <button onClick={closeEditModal} className="closeButton">&times;{ }</button>
                             <h3>Edit element</h3>
-                            <label>Название</label>
-                            <input></input>
+                            <label className="texts">Название</label>
+                            <input type='text' value={editName} onChange={(e) => setEditName(e.target.value)} placeholder='Введите название элемента'></input>
                             <button onClick={editElement}>Save</button>
                         </div>
                     </Modal>
