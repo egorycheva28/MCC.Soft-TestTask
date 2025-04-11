@@ -82,7 +82,7 @@ button {
     font-size: 44px;
 }
 
-.element {
+.selectedElement {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -92,6 +92,15 @@ button {
     border: 1px solid green;
 }
 
+.unselectedElement {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    padding: 5px;
+    margin: 10px 10px;
+    border: 1px solid red;
+}
 .name {
     font-weight: 450;
     font-size: 20px;
