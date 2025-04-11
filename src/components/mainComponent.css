@@ -25,6 +25,7 @@
 }
 
 .row2 {
+    min-height: 500px;
     width: 100%;
     border: 1px solid green;
     height: 100%;
@@ -82,27 +83,43 @@ button {
     font-size: 44px;
 }
 
-.selectedElement {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80px;
-    padding: 5px;
-    margin: 10px 10px;
-    border: 1px solid green;
-}
-
 .unselectedElement {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80px;
+    min-height: 25px;
+    width: 100px;
+    padding: 5px;
+    margin: 10px 10px;
+    border: 1px solid green;
+    cursor: pointer;
+}
+
+.selectedElement {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
     padding: 5px;
     margin: 10px 10px;
     border: 1px solid red;
+    cursor: pointer;
+    min-height: 25px;
 }
+
 .name {
     font-weight: 450;
     font-size: 20px;
+    color: green;
+}
+
+input {
+    width: 500px;
+    height: 30px;
+    margin: 10px 0;
+    border: 1px solid green;
+}
+
+.texts{
     color: green;
 }

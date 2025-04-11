@@ -2,23 +2,23 @@ import React, { useEffect, useState } from "react";
 import "./mainComponent.css";
 
 const Element = (props) => {
-    const [color, setColor] = useState("selectedElement");
+    const [color, setColor] = useState("unselectedElement");
 
     const selectedElement = (e) => {
         //props.setSelectedId(null);
         console.log("asd");
         e.stopPropagation();
         props.setSelectedId(props.id);
-        setColor("unselectedElement");
+        setColor("selectedElement");
     }
 
     const unselectedElement = () => {
-        setColor("selectedElement");
+        setColor("unselectedElement");
     };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (event.target.closest('.row3') === null) {
+            if (event.target.closest('.row3') === null && event.target.closest('.modal-content') === null) {
                 unselectedElement();
                 props.setSelectedId(null);
             }
@@ -33,8 +33,8 @@ const Element = (props) => {
     }, [props]);
 
     return (
-        <div className={color}>
-            <span className="name" onClick={selectedElement}>{props.name}</span>
+        <div className={color} onClick={selectedElement}>
+            <span className="name" >{props.name}</span>
         </div>
     );
 };
