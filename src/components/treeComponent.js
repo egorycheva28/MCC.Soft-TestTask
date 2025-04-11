@@ -69,8 +69,6 @@ const Tree = () => {
         dispatch(getTreeThunkCreator());
     }, [dispatch]);
 
-    console.log(selectedId);
-
     return (
         <div className="container">
             <div className="box">

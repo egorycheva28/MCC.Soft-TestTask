@@ -18,12 +18,7 @@ const treeReducer = (state = initialState, action) => {
             newState.tree = removeElement(newState.tree, action.id);
             return newState;
         case EDIT_ELEMENT:
-            newState.tree = newState.tree.map((element) => {
-                if (element.id === action.id) {
-                    return { ...element, name: action.editElement };
-                }
-                return element;
-            });
+            newState.tree = editElement(newState.tree, action.editElement, action.id);
             return newState;
         case GET_TREE:
             return newState;
@@ -65,6 +60,20 @@ const removeElement = (tree, elementId) => {
         return [...accumulator, { ...element, children }];
     }, []);
 }
+
+const editElement = (tree, newElement, editElementId) => {
+    return tree.map(element => {
+        if (element.id === editElementId) {
+            return { ...element, name: newElement };
+        } else if (element.children) {
+            return {
+                ...element,
+                children: editElement(element.children, newElement, editElementId)
+            };
+        }
+        return element;
+    });
+};
 
 export function addElementActionCreator(data, parentId) {
     return { type: ADD_ELEMENT, element: data, parentId: parentId }
