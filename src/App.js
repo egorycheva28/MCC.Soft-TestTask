@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import Tree from './components/mainComponent';
+import Tree from './components/treeComponent';
 
 function App() {
   return (

@@ -1,25 +1,22 @@
-import React, { useState, useEffect } from "react";
-import "./mainComponent.css";
+import React, { useState, useEffect, Children } from "react";
+import "./treeComponent.css";
 import Modal from "react-modal";
-import Element from "./componentItem";
-import store from "../store/store";
+import Element from "./treeComponentItem";
 import { useDispatch, useSelector } from "react-redux";
 import { addElementThunkCreator, editElementThunkCreator, getTreeThunkCreator, removeElementThunkCreator, resetTreeThunkCreator } from "../reducers/treeReducer";
 
 Modal.setAppElement('#root');
 
-const Tree = ({ treeReducers }) => {
+const Tree = () => {
     const dispatch = useDispatch()
 
     const [selectedId, setSelectedId] = useState(null);
-    const [tree, setTree] = useState();
     const [addModalIsOpen, setAddModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [name, setName] = useState("");
-    const [currentElement, setCurrentElement] = useState(1);
-    const [parent, setParent] = useState("");
+    const [currentElementId, setCurrentElementId] = useState(1);
     const [editName, setEditName] = useState("");
-    const trees = useSelector(state => state.treeReducers.tree);
+    const trees = useSelector(state => state.treeReducer.tree);
 
     const openAddModal = () => {
         setAddModalIsOpen(true);
@@ -37,62 +34,42 @@ const Tree = ({ treeReducers }) => {
         setEditModalIsOpen(false);
     };
 
-    const addElement = async () => {
+    const addElement = () => {
         const newElement = {
-            id: currentElement,
-            name: name
+            id: currentElementId,
+            name: name,
+            children: []
         };
-        dispatch(addElementThunkCreator(newElement));
-        setCurrentElement(currentElement + 1);
-        //setTree();
-        setTree(name);
+
+        dispatch(addElementThunkCreator(newElement, selectedId));
+        setCurrentElementId(currentElementId + 1);
         setName('');
         setAddModalIsOpen(false);
-
+        setSelectedId(null);
     };
 
     const editElement = () => {
         dispatch(editElementThunkCreator(selectedId, editName));
         setEditName('');
         setEditModalIsOpen(false);
+        setSelectedId(null);
     };
 
-    const removeElement = async () => {
+    const removeElement = () => {
         dispatch(removeElementThunkCreator(selectedId));
-        const da = await dispatch(getTreeThunkCreator());
-        setTree(da);
+        setSelectedId(null);
     };
 
     const resetTree = () => {
         dispatch(resetTreeThunkCreator());
-        //setTree();
+        setSelectedId(null);
     };
 
     useEffect(() => {
-
-        const fetchData = async () => {
-
-            //setTree("Hello");
-            /*let data = {
-                id: 1,
-                name: "qwe"
-            };
-            await dispatch(addElementThunkCreator(data));*/
-
-
-            dispatch(getTreeThunkCreator());
-            setTree(store.getState());
-            console.log(store.getState().treeReducers.tree);
-            //console.log(store.getState().treeReducer.element);
-            //console.log(trees);
-
-        };
-
-        fetchData();
+        dispatch(getTreeThunkCreator());
     }, [dispatch]);
-    console.log(trees);
+
     console.log(selectedId);
-    console.log(store.getState());
 
     return (
         <div className="container">
@@ -104,38 +81,34 @@ const Tree = ({ treeReducers }) => {
                     <div className="elements">
                         {
                             trees.map((value) => (
-                                <Element name={value.name} id={value.id} key={value.id} setSelectedId={setSelectedId} />
+                                <Element name={value.name} children={value.children} id={value.id} key={value.id} setSelectedId={setSelectedId} selectedId={selectedId} />
                             ))
                         }
-
                     </div>
                 </div>
                 <div className="row3">
-                    <button onClick={openAddModal} className="text">Add</button>
-                    <Modal isOpen={addModalIsOpen} onRequestClose={closeAddModal} className="modal-content">
+                    <button onClick={openAddModal} className="textButton">Add</button>
+                    <Modal isOpen={addModalIsOpen} onRequestClose={closeAddModal} className="modal">
                         <div className="content">
                             <button onClick={closeAddModal} className="closeButton">&times;{ }</button>
                             <h3>Add element</h3>
-                            <label className="texts">Название</label>
+                            <label className="text">Name</label>
                             <input type='text' value={name} onChange={(e) => setName(e.target.value)} placeholder='Введите название элемента' ></input>
-                            <label className="texts">родительский элемент</label>
-                            <input type='text' value={parent} onChange={(e) => setParent(e.target.value)}></input>
                             <button onClick={addElement}>Add</button>
                         </div>
                     </Modal>
-                    <button onClick={removeElement} className="text">Remove</button>
-
-                    <button onClick={openEditModal} className="text">Edit</button>
-                    <Modal isOpen={editModalIsOpen} onRequestClose={closeEditModal} className="modal-content">
+                    <button onClick={removeElement} className="textButton">Remove</button>
+                    <button onClick={openEditModal} className="textButton">Edit</button>
+                    <Modal isOpen={editModalIsOpen} onRequestClose={closeEditModal} className="modal">
                         <div className="content">
                             <button onClick={closeEditModal} className="closeButton">&times;{ }</button>
                             <h3>Edit element</h3>
-                            <label className="texts">Название</label>
+                            <label className="text">Name</label>
                             <input type='text' value={editName} onChange={(e) => setEditName(e.target.value)} placeholder='Введите название элемента'></input>
                             <button onClick={editElement}>Save</button>
                         </div>
                     </Modal>
-                    <button onClick={resetTree} className="text">Reset</button>
+                    <button onClick={resetTree} className="textButton">Reset</button>
                 </div>
             </div>
         </div>

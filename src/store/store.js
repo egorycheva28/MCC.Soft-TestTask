@@ -3,7 +3,7 @@ import { thunk } from "redux-thunk";
 import treeReducer from "../reducers/treeReducer";
 
 let reducers = combineReducers({
-    treeReducers: treeReducer
+    treeReducer: treeReducer
 });
 
 let store = createStore(reducers, applyMiddleware(thunk));

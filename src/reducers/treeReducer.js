@@ -5,25 +5,24 @@ const GET_TREE = "GET_TREE";
 const RESET_TREE = "RESET_TREE";
 
 let initialState = {
-    tree: [],
-    id: ''
+    tree: []
 }
 
 const treeReducer = (state = initialState, action) => {
     let newState = { ...state };
     switch (action.type) {
         case ADD_ELEMENT:
-            newState.tree = [...newState.tree, action.element];
+            newState.tree = addElement(newState.tree, action.element, action.parentId);
             return newState;
         case REMOVE_ELEMENT:
-            newState.tree = newState.tree.filter(element => element.id !== action.id);
+            newState.tree = removeElement(newState.tree, action.id);
             return newState;
         case EDIT_ELEMENT:
-            newState.tree = newState.tree.map((item) => {
-                if (item.id === action.id) {
-                    return { ...item, name: action.element };
+            newState.tree = newState.tree.map((element) => {
+                if (element.id === action.id) {
+                    return { ...element, name: action.editElement };
                 }
-                return item;
+                return element;
             });
             return newState;
         case GET_TREE:
@@ -36,17 +35,49 @@ const treeReducer = (state = initialState, action) => {
     }
 }
 
-export function addElementActionCreator(data) {
-    return { type: ADD_ELEMENT, element: data }
+const addElement = (tree, newElement, parentId) => {
+    if (parentId === null) {
+        return [...tree, newElement];
+    }
+
+    return tree.map(element => {
+        if (element.id === parentId) {
+            return {
+                ...element,
+                children: [...(element.children), newElement]
+            };
+        } else if (element.children) {
+            return {
+                ...element,
+                children: addElement(element.children, newElement, parentId)
+            };
+        }
+        return element;
+    });
+};
+
+const removeElement = (tree, elementId) => {
+    return tree.reduce((accumulator, element) => {
+        if (element.id === elementId) {
+            return accumulator;
+        }
+        const children = removeElement(element.children, elementId);
+        return [...accumulator, { ...element, children }];
+    }, []);
 }
 
-export function addElementThunkCreator(element) {
+export function addElementActionCreator(data, parentId) {
+    return { type: ADD_ELEMENT, element: data, parentId: parentId }
+}
+
+export function addElementThunkCreator(element, parentId) {
     return (dispatch) => {
-        if (element.name == '') {
+        if (!element.name) {
             alert(("Введите название элемента"));
             return;
         }
-        dispatch(addElementActionCreator(element));
+
+        dispatch(addElementActionCreator(element, parentId));
     }
 }
 
@@ -54,27 +85,27 @@ export function removeElementActionCreator(data) {
     return { type: REMOVE_ELEMENT, id: data }
 }
 
-export function removeElementThunkCreator(id) {
+export function removeElementThunkCreator(elementId) {
     return (dispatch) => {
-        if (id == null) {
+        if (!elementId) {
             alert(("Выберите элемент для удаления"));
             return;
         }
-        dispatch(removeElementActionCreator(id));
+        dispatch(removeElementActionCreator(elementId));
     }
 }
 
 export function editElementActionCreator(elementId, elementName) {
-    return { type: EDIT_ELEMENT, id: elementId, element: elementName }
+    return { type: EDIT_ELEMENT, id: elementId, editElement: elementName }
 }
 
 export function editElementThunkCreator(elementId, elementName) {
     return (dispatch) => {
-        if (elementId == null) {
+        if (!elementId) {
             alert(("Выберите элемент для редактирования"));
             return;
         }
-        if (elementName == '') {
+        if (!elementName) {
             alert(("Введите название элемента"));
             return;
         }
